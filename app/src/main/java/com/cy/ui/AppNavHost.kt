@@ -26,7 +26,9 @@ import com.cy.ui.page.text.TextPageUI
  * @Description  : 主导航页
  */
 
-val backStack by lazy { NavBackStack<NavKey>(HomePageKey) }
+val backStack by lazy(LazyThreadSafetyMode.SYNCHRONIZED) {
+    NavBackStack<NavKey>(HomePageKey)
+}
 
 @Composable
 fun NavigationRoot(modifier: Modifier = Modifier) {
@@ -72,7 +74,7 @@ fun NavigationRoot(modifier: Modifier = Modifier) {
             slideInHorizontally(
                 initialOffsetX = { -it },
                 animationSpec = tween(300)
-            ) + fadeIn(animationSpec = tween(300))  togetherWith slideOutHorizontally(
+            ) + fadeIn(animationSpec = tween(300)) togetherWith slideOutHorizontally(
                 targetOffsetX = { it },
                 animationSpec = tween(300)
             ) + fadeOut(animationSpec = tween(300))
