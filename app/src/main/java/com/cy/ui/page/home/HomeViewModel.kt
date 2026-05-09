@@ -14,10 +14,10 @@ class HomeViewModel: ViewModel() {
         "文本" to TextPageKey,
         "按钮" to TextPageKey,
         "输入框" to TextPageKey,
-        "分页和触摸冲突" to TextPageKey,
-        "Banner" to TextPageKey,
+        "分页和TabView" to TextPageKey,
+        "触摸冲突和Banner" to TextPageKey,
         "下拉刷新和上滑加载" to TextPageKey,
         "列表" to TextPageKey,
-        "输入框" to TextPageKey,
+        "流式和网格" to TextPageKey,
     )
 }

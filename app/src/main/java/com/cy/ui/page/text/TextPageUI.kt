@@ -83,6 +83,7 @@ fun TextPageUI(modifier: Modifier = Modifier) {
                 //因为链式操作，所以没有margin,都能用padding实现
                 .padding(8.dp, 5.dp, 8.dp, 5.dp)
         )
+        Text("123sdf1a3df", Modifier.background(Color.Yellow))
     }
 }
 

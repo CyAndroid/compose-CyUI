@@ -42,11 +42,18 @@ fun HomePageUI(modifier: Modifier = Modifier) {
             .fillMaxSize()
     ) {
         items(viewModel.items, span = {
-            GridItemSpan(if (viewModel.items.indexOf(it) == 5 || viewModel.items.indexOf(it) == 3) 3 else 1)
+            val span = when (viewModel.items.indexOf(it)) {
+                3, 5 -> 3
+                4, 7 -> 2
+                else -> 1
+            }
+            GridItemSpan(span)
         }) {
             Button({
                 backStack.add(it.second)
-            }, Modifier.background(Color.Green).padding(start = 5.dp, end = 5.dp)) {
+            }, Modifier
+                .background(Color.Green)
+                .padding(start = 5.dp, end = 5.dp)) {
                 Text(it.first)
             }
         }
