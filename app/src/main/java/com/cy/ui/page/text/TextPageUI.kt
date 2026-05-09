@@ -5,6 +5,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeContentPadding
@@ -83,7 +84,7 @@ fun TextPageUI(modifier: Modifier = Modifier) {
                 //因为链式操作，所以没有margin,都能用padding实现
                 .padding(8.dp, 5.dp, 8.dp, 5.dp)
         )
-        Text("123sdf1a3df", Modifier.background(Color.Yellow))
+        Spacer(Modifier.background(Color.Yellow).size(100.dp,50.dp))
     }
 }
 
