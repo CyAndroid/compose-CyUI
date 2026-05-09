@@ -1,6 +1,5 @@
-package com.cy.ui.ui.theme
+package com.cy.ui.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
