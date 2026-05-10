@@ -14,6 +14,8 @@ import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSaveableStateHolderNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
+import com.cy.ui.page.edittext.EditTextPageKey
+import com.cy.ui.page.edittext.EditTextPageUI
 import com.cy.ui.page.home.HomePageKey
 import com.cy.ui.page.home.HomePageUI
 import com.cy.ui.page.text.TextPageKey
@@ -39,8 +41,8 @@ fun NavigationRoot(modifier: Modifier = Modifier) {
             entry<HomePageKey> {
                 HomePageUI()
             }
-            entry<TextPageKey> {
-                TextPageUI()
+            entry<EditTextPageKey> {
+                EditTextPageUI()
             }
         },
         entryDecorators = listOf(
