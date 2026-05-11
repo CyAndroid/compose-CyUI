@@ -92,6 +92,6 @@ fun PageBreakPageUI(modifier: Modifier = Modifier) {
             }
         }
 
-        BannerUI(viewModel.bannersMocData, Modifier.size(200.dp, 100.dp))
+        BannerUI(listOf("https://cdn.cnbj1.fds.api.mi-img.com/mi-mall/0b2bb13c396cc6205dd91da3a91a275a.jpg?f=webp&w=1080&h=540&bg=A8D4D5"), Modifier.size(200.dp, 100.dp))
     }
 }
