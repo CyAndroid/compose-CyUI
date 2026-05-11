@@ -32,6 +32,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import coil3.compose.AsyncImage
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.delay
@@ -62,64 +65,100 @@ fun BannerUI(
     //页面管理
     val pagerState = rememberPagerState(0) { data.size }
 
-    // 自动滚动的协程
     val scope = rememberCoroutineScope()
     var autoScrollJob by remember { mutableStateOf<Job?>(null) }
-
-    // 标记当前是否正在执行自动触发的滚动动画（用于排除自身的干扰）
     var isProgrammaticScroll by remember { mutableStateOf(false) }
 
-    // 重置自动滚动：取消旧的 Job，启动新的延时任务
-    fun resetAutoScroll() {
+    // 获取当前组件的生命周期
+    val lifecycleOwner = LocalLifecycleOwner.current
+    val lifecycle = lifecycleOwner.lifecycle
+
+    // 启动或停止自动滚动的方法
+    fun startAutoScroll() {
+        // 如果已经有Job，先取消再创建新的（保证每次重新开始计时）
         autoScrollJob?.cancel()
         if (autoScrollDelay <= 0) return
         autoScrollJob = scope.launch {
+            // 等待 delay 时间
             delay(autoScrollDelay)
-            // 延时结束后，如果用户没有正在滚动，也没有自动滚动正在进行，则触发翻页
-            if (!pagerState.isScrollInProgress && !isProgrammaticScroll) {
+            // 只有在页面可见（至少是 RESUMED）且没有用户滚动时，才执行翻页
+            if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED) &&
+                !pagerState.isScrollInProgress &&
+                !isProgrammaticScroll
+            ) {
                 val nextPage = (pagerState.currentPage + 1) % data.size
                 isProgrammaticScroll = true
                 try {
                     pagerState.animateScrollToPage(nextPage)
                 } finally {
                     isProgrammaticScroll = false
-                    // 翻页动画结束后，重新开始倒计时（实现无限循环）
-                    resetAutoScroll()
+                    // 动画结束后继续下一轮滚动（但需要先检查页面是否还在前台）
+                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        startAutoScroll()
+                    }
                 }
             } else {
-                // 如果正处于滚动状态（用户或自动），则等待100ms再重试
-                // 这种场景很少发生，但为了健壮性
-                resetAutoScroll()
+                // 如果条件不满足（例如页面已不在前台），则重新等待一小段时间后重试
+                // 实际上如果生命周期不在 RESUMED，我们会在生命周期的 PAUSE 中取消 Job，
+                // 这里仅作为保护，避免死循环
+                if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                    startAutoScroll()
+                }
             }
         }
     }
 
-    // 监听用户交互的开始和结束
+    fun stopAutoScroll() {
+        autoScrollJob?.cancel()
+        autoScrollJob = null
+    }
+
+    // 监听生命周期变化
+    DisposableEffect(lifecycle) {
+        val observer = LifecycleEventObserver { _, event ->
+            when (event) {
+                Lifecycle.Event.ON_RESUME -> {
+                    // 页面可见，启动自动滚动（重置计时器）
+                    startAutoScroll()
+                }
+
+                Lifecycle.Event.ON_PAUSE -> {
+                    // 页面不可见，停止自动滚动
+                    stopAutoScroll()
+                }
+
+                else -> {}
+            }
+        }
+        lifecycle.addObserver(observer)
+
+        onDispose {
+            lifecycle.removeObserver(observer)
+            stopAutoScroll()
+        }
+    }
+
+    // 监听用户滚动状态（重置倒计时）
     LaunchedEffect(pagerState) {
         if (autoScrollDelay <= 0) return@LaunchedEffect
         snapshotFlow { pagerState.isScrollInProgress }
             .collect { isScrolling ->
+                // 只处理用户主动滚动（非自动动画）
                 if (isScrolling && !isProgrammaticScroll) {
-                    // 用户开始拖拽（非自动触发的滚动）→ 取消自动滚动计时
+                    // 用户开始拖拽 → 取消当前定时
                     autoScrollJob?.cancel()
                 } else if (!isScrolling && !isProgrammaticScroll) {
-                    // 用户结束拖拽（手指离开且惯性滚动也结束了）→ 重置定时器，重新等待3秒
-                    resetAutoScroll()
+                    // 用户结束拖拽（手指离开且惯性滚动停止）→ 重新开始倒计时（仅当页面可见时）
+                    if (lifecycle.currentState.isAtLeast(Lifecycle.State.RESUMED)) {
+                        startAutoScroll()
+                    }
                 }
             }
     }
 
-    // 首次加载时启动自动滚动
-    LaunchedEffect(Unit) {
-        if (autoScrollDelay <= 0) return@LaunchedEffect
-        resetAutoScroll()
-    }
-
-    // 组件销毁时清理协程
-    DisposableEffect(Unit) {
-        onDispose {
-            autoScrollJob?.cancel()
-        }
+    // 如果 itemCount <= 1，则不应有滚动逻辑（此处简单禁用）
+    if (data.size <= 1) {
+        return
     }
 
     //正式开始构建界面
