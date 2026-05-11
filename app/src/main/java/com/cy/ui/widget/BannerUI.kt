@@ -77,7 +77,8 @@ fun BannerUI(
     fun startAutoScroll() {
         // 如果已经有Job，先取消再创建新的（保证每次重新开始计时）
         autoScrollJob?.cancel()
-        if (autoScrollDelay <= 0) return
+        // 如果 itemCount <= 1，则不应有滚动逻辑（此处简单禁用）
+        if (autoScrollDelay <= 0 || data.size <= 1) return
         autoScrollJob = scope.launch {
             // 等待 delay 时间
             delay(autoScrollDelay)
@@ -140,7 +141,7 @@ fun BannerUI(
 
     // 监听用户滚动状态（重置倒计时）
     LaunchedEffect(pagerState) {
-        if (autoScrollDelay <= 0) return@LaunchedEffect
+        if (autoScrollDelay <= 0 || data.size <= 1) return@LaunchedEffect
         snapshotFlow { pagerState.isScrollInProgress }
             .collect { isScrolling ->
                 // 只处理用户主动滚动（非自动动画）
@@ -154,11 +155,6 @@ fun BannerUI(
                     }
                 }
             }
-    }
-
-    // 如果 itemCount <= 1，则不应有滚动逻辑（此处简单禁用）
-    if (data.size <= 1) {
-        return
     }
 
     //正式开始构建界面
@@ -190,15 +186,17 @@ fun BannerUI(
                 contentScale = ContentScale.Crop,
             )
         }
-        //指示器
-        BannerIndicator(
-            data.size,
-            pagerState.currentPage,
-            Modifier
-                //针对父组件是Box时，可以设置自己的位置权重
-                .align(Alignment.BottomCenter)
-                .padding(bottom = 10.dp)
-        )
+        if (data.size > 1){
+            //指示器
+            BannerIndicator(
+                data.size,
+                pagerState.currentPage,
+                Modifier
+                    //针对父组件是Box时，可以设置自己的位置权重
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 10.dp)
+            )
+        }
     }
 }
 
