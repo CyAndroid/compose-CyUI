@@ -43,8 +43,8 @@ fun HomePageUI(modifier: Modifier = Modifier) {
     ) {
         items(viewModel.items, span = {
             val span = when (viewModel.items.indexOf(it)) {
-                3, 5 -> 3
-                4, 7 -> 2
+                3, 4 -> 3
+                6 -> 2
                 else -> 1
             }
             GridItemSpan(span)

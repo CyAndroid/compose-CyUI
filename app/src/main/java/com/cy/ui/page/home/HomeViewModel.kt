@@ -14,10 +14,9 @@ import com.cy.ui.page.text.TextPageKey
 class HomeViewModel: ViewModel() {
     val items = listOf(
         "文本" to TextPageKey,
-        "按钮" to TextPageKey,
         "输入框" to EditTextPageKey,
-        "分页和TabView" to PageBreakPageKey,
-        "触摸冲突和Banner" to TextPageKey,
+        "触摸冲突" to TextPageKey,
+        "分页、TabView和Banner" to PageBreakPageKey,
         "下拉刷新和上滑加载" to TextPageKey,
         "列表" to TextPageKey,
         "流式和网格" to TextPageKey,
