@@ -8,6 +8,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.safeContentPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
@@ -21,7 +22,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation3.runtime.NavKey
+import com.cy.ui.widget.BannerUI
 import kotlinx.coroutines.launch
 import kotlinx.serialization.Serializable
 
@@ -36,6 +39,8 @@ data object PageBreakPageKey : NavKey
 
 @Composable
 fun PageBreakPageUI(modifier: Modifier = Modifier) {
+
+    val viewModel: BannerViewModel = viewModel()
 
     val datas = remember {
         mutableStateListOf("香蕉", "苹果", "芒果", "萝卜", "咖啡")
@@ -86,5 +91,7 @@ fun PageBreakPageUI(modifier: Modifier = Modifier) {
                 Text(text = datas[pagePosition])
             }
         }
+
+        BannerUI(viewModel.bannersMocData, Modifier.size(200.dp, 100.dp))
     }
 }

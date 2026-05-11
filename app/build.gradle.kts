@@ -65,4 +65,5 @@ dependencies {
 
     //图片加载器
     implementation(libs.coil.compose)
+    implementation(libs.coil.network.okhttp)
 }
